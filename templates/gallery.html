@@ -34,16 +34,23 @@
                             <div class="row g-3">
                                 {% for graph in pdf.graphs %}
                                 <div class="col-md-4 col-12">
-                                    <div class="card graph-card h-100 p-2">
-                                        <input type="checkbox" class="form-check-input graph-select" name="selected_graphs" value="{{ graph.filename }}" style="margin-bottom: 8px;">
+                                    <div class="card graph-card h-100 p-2 selectable-graph" data-filename="{{ graph.filename }}">
                                         <img src="/static/{{ graph.img }}" class="graph-img" alt="Graph image">
-                                        <div class="caption small text-muted">{{ graph.caption }}</div>
+                                        {% if graph.x_label or graph.y_label %}
+                                        <div class="caption small text-muted">
+                                            {% if graph.x_label %}<b>X-axis:</b> {{ graph.x_label }}<br>{% endif %}
+                                            {% if graph.y_label %}<b>Y-axis:</b> {{ graph.y_label }}<br>{% endif %}
+                                        </div>
+                                        {% endif %}
+                                        {% if graph.caption %}
+                                        <div class="caption small text-muted"><b>Caption:</b> {{ graph.caption }}</div>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 {% endfor %}
                             </div>
-                            <div class="mt-3">
-                                <button type="button" class="btn btn-danger delete-graphs-btn">Delete Selected Graphs</button>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-danger btn-sm delete-graphs-btn" disabled>Delete Selected Graphs</button>
                             </div>
                         </form>
                         {% else %}
@@ -63,50 +70,139 @@
         <div class="alert alert-secondary text-center">No PDFs or graphs found. <a href="{{ url_for('index') }}">Upload some PDFs</a>!</div>
     {% endif %}
 </div>
+<div id="graph-action-menu" style="display:none; position:absolute; z-index:1000;" class="card p-2">
+    <button id="action-delete" class="btn btn-danger btn-sm w-100 mb-1">Delete</button>
+    <button id="action-extract" class="btn btn-primary btn-sm w-100">Extract Sub-Graphs</button>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-// Handle graph deletion
-    document.querySelectorAll('.graph-delete-form').forEach(form => {
-        form.querySelector('.delete-graphs-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-            const pdfName = form.getAttribute('data-pdf-name');
-            const selected = Array.from(form.querySelectorAll('.graph-select:checked')).map(cb => cb.value);
-            if (selected.length === 0) {
-                alert('Select at least one graph to delete.');
-                return;
+document.querySelectorAll('.graph-delete-form').forEach(form => {
+    const pdfName = form.getAttribute('data-pdf-name');
+    let selectedGraphs = new Set();
+    form.querySelectorAll('.selectable-graph').forEach(card => {
+        card.addEventListener('click', function() {
+            const filename = this.getAttribute('data-filename');
+            if (this.classList.contains('selected')) {
+                this.classList.remove('selected');
+                selectedGraphs.delete(filename);
+            } else {
+                this.classList.add('selected');
+                selectedGraphs.add(filename);
             }
+            updateDeleteButton(form, selectedGraphs);
+        });
+    });
+    const deleteBtn = form.querySelector('.delete-graphs-btn');
+    function updateDeleteButton(form, selectedGraphs) {
+        if (deleteBtn) {
+            deleteBtn.disabled = selectedGraphs.size === 0;
+        }
+    }
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (selectedGraphs.size === 0) return;
             if (!confirm('Delete selected graphs?')) return;
             fetch('/delete_graphs', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({ pdf_name: pdfName, graphs: selected })
+                body: JSON.stringify({ pdf_name: pdfName, graphs: Array.from(selectedGraphs) })
             }).then(res => res.json()).then(data => {
                 if (data.success) location.reload();
             });
         });
-    });
-    // Handle PDF deletion
-    document.querySelectorAll('.delete-pdf-form').forEach(form => {
-        form.querySelector('button').addEventListener('click', function(e) {
-            e.preventDefault();
-            const pdfName = form.getAttribute('data-pdf-name');
-            if (!confirm('Delete this PDF and all its data?')) return;
-            fetch('/delete_pdf', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({ pdf_name: pdfName })
-            }).then(res => res.json()).then(data => {
-                if (data.success) location.reload();
-            });
+    }
+});
+
+// PDF delete logic
+
+document.querySelectorAll('.delete-pdf-form').forEach(form => {
+    form.querySelector('button').addEventListener('click', function(e) {
+        e.preventDefault();
+        const pdfName = form.getAttribute('data-pdf-name');
+        if (!confirm('Delete this PDF and all its data?')) return;
+        fetch('/delete_pdf', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ pdf_name: pdfName })
+        }).then(res => res.json()).then(data => {
+            if (data.success) location.reload();
         });
     });
+});
+
+let actionMenu = document.getElementById('graph-action-menu');
+let currentGraph = null;
+let currentPdfName = null;
+
+// Hide menu on click elsewhere
+window.addEventListener('click', function(e) {
+    if (!actionMenu.contains(e.target)) {
+        actionMenu.style.display = 'none';
+        currentGraph = null;
+        currentPdfName = null;
+    }
+});
+
+document.querySelectorAll('.graph-card').forEach(card => {
+    card.addEventListener('contextmenu', function(e) { e.preventDefault(); }); // Prevent default right-click
+    card.addEventListener('click', function(e) {
+        e.stopPropagation();
+        // Find PDF name from parent form
+        const form = card.closest('.graph-delete-form');
+        const pdfName = form ? form.getAttribute('data-pdf-name') : null;
+        currentGraph = card.getAttribute('data-filename');
+        currentPdfName = pdfName;
+        // Position menu
+        actionMenu.style.left = e.pageX + 'px';
+        actionMenu.style.top = e.pageY + 'px';
+        actionMenu.style.display = 'block';
+    });
+});
+
+document.getElementById('action-delete').onclick = function(e) {
+    e.preventDefault();
+    if (!currentGraph || !currentPdfName) return;
+    if (!confirm('Delete this graph?')) return;
+    fetch('/delete_graphs', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ pdf_name: currentPdfName, graphs: [currentGraph] })
+    }).then(res => res.json()).then(data => {
+        if (data.success) location.reload();
+    });
+};
+
+document.getElementById('action-extract').onclick = function(e) {
+    e.preventDefault();
+    if (!currentGraph || !currentPdfName) return;
+    fetch('/extract_subgraphs', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ pdf_name: currentPdfName, graph_filename: currentGraph })
+    }).then(res => res.json()).then(data => {
+        if (data.success) location.reload();
+    });
+};
 </script>
+<style>
+.selectable-graph.selected {
+    border: 2px solid #007bff;
+    background: #eaf4ff;
+}
+#graph-action-menu { min-width: 140px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+</style>
 </body>
 </html> 
