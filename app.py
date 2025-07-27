@@ -22,14 +22,16 @@ class PDFUploadForm(FlaskForm):
     submit = SubmitField('Upload')
 
 def get_gallery_data():
-    """Scan static/files/ and static/files/graphs/ to build gallery data structure."""
+    # Make sure to import these at the top: from process_pdfs import find_alloy_names, classify_alloy
+    from process_pdfs import find_alloy_names, classify_alloy
+
     gallery = []
     pdfs = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.lower().endswith('.pdf')]
     for pdf in pdfs:
         pdf_name = os.path.splitext(pdf)[0]
-        pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], pdf)
         graph_dir = os.path.join(app.config['GRAPH_FOLDER'], pdf_name)
         graphs = []
+        captions_all = []  # <-- Move here, per-PDF!
         if os.path.isdir(graph_dir):
             for img in os.listdir(graph_dir):
                 if img.lower().endswith(('.png', '.jpg', '.jpeg')):
@@ -41,9 +43,24 @@ def get_gallery_data():
                     if os.path.exists(caption_path):
                         with open(caption_path, 'r') as f:
                             caption = f.read().strip()
+                            if caption:
+                                captions_all.append(caption)
                     graphs.append({'img': rel_img_path, 'caption': caption, 'filename': img})
-        gallery.append({'pdf': pdf, 'pdf_name': pdf_name, 'graphs': graphs})
+        # --- Extract alloy info from all captions for this paper ---
+        alloy_set = set()
+        alloy_infos = []
+        for caption in captions_all:
+            alloys = find_alloy_names(caption)
+            for alloy in alloys:
+                if alloy not in alloy_set:
+                    alloy_set.add(alloy)
+                    atype, category, desc = classify_alloy(alloy)
+                    alloy_infos.append({
+                        "name": alloy, "type": atype, "category": category, "description": desc
+                    })
+        gallery.append({'pdf': pdf, 'pdf_name': pdf_name, 'graphs': graphs, 'alloys': alloy_infos})
     return gallery
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -113,5 +130,41 @@ def delete_pdf():
         shutil.rmtree(graph_dir)
     return jsonify({'success': True})
 
+@app.route('/extract_subgraphs', methods=['POST'])
+def extract_subgraphs():
+    data = request.get_json()
+    pdf_name = data.get('pdf_name')
+    graph_filename = data.get('graph_filename')
+    if not pdf_name or not graph_filename:
+        return jsonify({'success': False, 'error': 'Missing parameters'}), 400
+
+    graph_dir = os.path.join(app.config['GRAPH_FOLDER'], pdf_name)
+    graph_path = os.path.join(graph_dir, graph_filename)
+    if not os.path.exists(graph_path):
+        return jsonify({'success': False, 'error': 'Graph image not found'}), 404
+
+    # Optional: get caption if exists
+    caption = ''
+    caption_path = os.path.splitext(graph_path)[0] + '.txt'
+    if os.path.exists(caption_path):
+        with open(caption_path, 'r') as f:
+            caption = f.read().strip()
+
+    # Output directory for subgraphs (same as graph_dir)
+    output_dir = graph_dir
+    from process_pdfs import split_graph_into_subgraphs_with_labels
+    subgraphs = split_graph_into_subgraphs_with_labels(graph_path, output_dir, caption)
+
+    # Optionally, remove the original graph after splitting
+    # os.remove(graph_path)
+    # if os.path.exists(caption_path):
+    #     os.remove(caption_path)
+
+    if subgraphs:
+        # Optionally, add subgraphs to gallery or return their info
+        return jsonify({'success': True, 'subgraphs': [os.path.basename(s['path']) for s in subgraphs]})
+    else:
+        return jsonify({'success': False, 'error': 'No valid subgraphs found'})
+
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True)

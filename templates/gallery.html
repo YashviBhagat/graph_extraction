@@ -13,11 +13,13 @@
     </style>
 </head>
 <body>
+
 <div class="container py-4">
     <h1 class="mb-4 text-center">Graph Gallery</h1>
     <div class="mb-3 text-center">
         <a href="{{ url_for('index') }}" class="btn btn-link">Upload More PDFs</a>
     </div>
+
     {% if gallery %}
         <div class="accordion" id="pdfAccordion">
         {% for pdf in gallery %}
@@ -29,6 +31,24 @@
                 </h2>
                 <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#pdfAccordion">
                     <div class="accordion-body">
+                        {# ---- Alloy Description Block ---- #}
+                        {% if pdf.alloys %}
+                        <div class="alert alert-info mb-3">
+                            <h5 class="mb-2">Alloy Descriptions for <b>{{ pdf.pdf }}</b></h5>
+                            {% for alloy in pdf.alloys %}
+                                <div style="margin-bottom: 0.5em;">
+                                    <b>Name:</b> {{ alloy.name }}<br>
+                                    <b>Type:</b> {{ alloy.type }}<br>
+                                    <b>Category:</b> {{ alloy.category }}<br>
+                                    <b>Description:</b> {{ alloy.description }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning mb-3">No alloys found in captions for this paper.</div>
+                        {% endif %}
+
+                        {# ---- Graphs Section ---- #}
                         {% if pdf.graphs %}
                         <form class="graph-delete-form mb-3" data-pdf-name="{{ pdf.pdf_name }}">
                             <div class="row g-3">
@@ -117,8 +137,6 @@ document.querySelectorAll('.graph-delete-form').forEach(form => {
     }
 });
 
-// PDF delete logic
-
 document.querySelectorAll('.delete-pdf-form').forEach(form => {
     form.querySelector('button').addEventListener('click', function(e) {
         e.preventDefault();
@@ -141,7 +159,6 @@ let actionMenu = document.getElementById('graph-action-menu');
 let currentGraph = null;
 let currentPdfName = null;
 
-// Hide menu on click elsewhere
 window.addEventListener('click', function(e) {
     if (!actionMenu.contains(e.target)) {
         actionMenu.style.display = 'none';
@@ -151,15 +168,13 @@ window.addEventListener('click', function(e) {
 });
 
 document.querySelectorAll('.graph-card').forEach(card => {
-    card.addEventListener('contextmenu', function(e) { e.preventDefault(); }); // Prevent default right-click
+    card.addEventListener('contextmenu', function(e) { e.preventDefault(); });
     card.addEventListener('click', function(e) {
         e.stopPropagation();
-        // Find PDF name from parent form
         const form = card.closest('.graph-delete-form');
         const pdfName = form ? form.getAttribute('data-pdf-name') : null;
         currentGraph = card.getAttribute('data-filename');
         currentPdfName = pdfName;
-        // Position menu
         actionMenu.style.left = e.pageX + 'px';
         actionMenu.style.top = e.pageY + 'px';
         actionMenu.style.display = 'block';
@@ -205,4 +220,4 @@ document.getElementById('action-extract').onclick = function(e) {
 #graph-action-menu { min-width: 140px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 </style>
 </body>
-</html> 
+</html>
