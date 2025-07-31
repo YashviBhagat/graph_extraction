@@ -45,7 +45,36 @@ def get_gallery_data():
                             caption = f.read().strip()
                             if caption:
                                 captions_all.append(caption)
-                    graphs.append({'img': rel_img_path, 'caption': caption, 'filename': img})
+                    # Try to detect axis labels from the image with enhanced detection
+                    x_label, y_label = '', ''
+                    try:
+                        from process_pdfs import detect_axis_labels_enhanced
+                        import cv2
+                        img_array = cv2.imread(img_path)
+                        if img_array is not None:
+                            # Use enhanced axis label detection
+                            axis_labels = detect_axis_labels_enhanced(img_array)
+                            x_label = axis_labels.get('x', '')
+                            y_label = axis_labels.get('y', '')
+                            
+                            # If no labels detected, try with a larger region
+                            if not x_label and not y_label:
+                                # Expand the image region and try again
+                                height, width = img_array.shape[:2]
+                                expanded_region = img_array[max(0, height//8):height, max(0, width//8):width]
+                                axis_labels = detect_axis_labels_enhanced(expanded_region)
+                                x_label = axis_labels.get('x', '')
+                                y_label = axis_labels.get('y', '')
+                    except Exception as e:
+                        print(f"Error detecting axis labels for {img}: {e}")
+                    
+                    graphs.append({
+                        'img': rel_img_path, 
+                        'caption': caption, 
+                        'filename': img,
+                        'x_label': x_label,
+                        'y_label': y_label
+                    })
         # --- Extract alloy info from all captions for this paper ---
         alloy_set = set()
         alloy_infos = []
@@ -155,14 +184,24 @@ def extract_subgraphs():
     from process_pdfs import split_graph_into_subgraphs_with_labels
     subgraphs = split_graph_into_subgraphs_with_labels(graph_path, output_dir, caption)
 
-    # Optionally, remove the original graph after splitting
-    # os.remove(graph_path)
-    # if os.path.exists(caption_path):
-    #     os.remove(caption_path)
-
     if subgraphs:
-        # Optionally, add subgraphs to gallery or return their info
-        return jsonify({'success': True, 'subgraphs': [os.path.basename(s['path']) for s in subgraphs]})
+        # Return detailed information about extracted subgraphs
+        subgraph_info = []
+        for subgraph in subgraphs:
+            rel_path = subgraph['path'].replace('static/', '', 1)
+            subgraph_info.append({
+                'filename': os.path.basename(subgraph['path']),
+                'path': rel_path,
+                'caption': subgraph['caption'],
+                'x_label': subgraph['x_label'],
+                'y_label': subgraph['y_label']
+            })
+        
+        return jsonify({
+            'success': True, 
+            'message': f'Successfully extracted {len(subgraphs)} subgraphs',
+            'subgraphs': subgraph_info
+        })
     else:
         return jsonify({'success': False, 'error': 'No valid subgraphs found'})
 

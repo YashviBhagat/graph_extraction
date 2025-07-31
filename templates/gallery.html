@@ -56,14 +56,12 @@
                                 <div class="col-md-4 col-12">
                                     <div class="card graph-card h-100 p-2 selectable-graph" data-filename="{{ graph.filename }}">
                                         <img src="/static/{{ graph.img }}" class="graph-img" alt="Graph image">
-                                        {% if graph.x_label or graph.y_label %}
-                                        <div class="caption small text-muted">
-                                            {% if graph.x_label %}<b>X-axis:</b> {{ graph.x_label }}<br>{% endif %}
-                                            {% if graph.y_label %}<b>Y-axis:</b> {{ graph.y_label }}<br>{% endif %}
-                                        </div>
-                                        {% endif %}
+
                                         {% if graph.caption %}
-                                        <div class="caption small text-muted"><b>Caption:</b> {{ graph.caption }}</div>
+                                        <div class="caption small text-muted" style="background-color: #e7f3ff; padding: 8px; border-radius: 4px; margin-top: 8px;">
+                                            <strong>Caption:</strong><br>
+                                            {{ graph.caption }}
+                                        </div>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -200,6 +198,13 @@ document.getElementById('action-delete').onclick = function(e) {
 document.getElementById('action-extract').onclick = function(e) {
     e.preventDefault();
     if (!currentGraph || !currentPdfName) return;
+    
+    // Show loading state
+    const extractBtn = document.getElementById('action-extract');
+    const originalText = extractBtn.textContent;
+    extractBtn.textContent = 'Extracting...';
+    extractBtn.disabled = true;
+    
     fetch('/extract_subgraphs', {
         method: 'POST',
         headers: {
@@ -208,7 +213,18 @@ document.getElementById('action-extract').onclick = function(e) {
         },
         body: JSON.stringify({ pdf_name: currentPdfName, graph_filename: currentGraph })
     }).then(res => res.json()).then(data => {
-        if (data.success) location.reload();
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('Error: ' + (data.error || 'Failed to extract subgraphs'));
+        }
+    }).catch(error => {
+        alert('Error: ' + error.message);
+    }).finally(() => {
+        // Restore button state
+        extractBtn.textContent = originalText;
+        extractBtn.disabled = false;
     });
 };
 </script>
