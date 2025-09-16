@@ -1,7 +1,7 @@
 [
     {
         "page": 11,
-        "filename": "graph_11_1.jpeg",
+        "filename": "paper45_graph_11_1.jpeg",
         "x_axis_label": "engineering strain",
         "y_axis_label": "",
         "confidence": 0.8,
@@ -9,7 +9,7 @@
     },
     {
         "page": 16,
-        "filename": "graph_16_1.jpeg",
+        "filename": "paper45_graph_16_1.jpeg",
         "x_axis_label": "strain",
         "y_axis_label": "",
         "confidence": 0.8,

@@ -1,0 +1,10 @@
+[
+    {
+        "page": 6,
+        "filename": "1-s2.0-S0264127524009316-main_graph_6_1.jpeg",
+        "x_axis_label": "strain",
+        "y_axis_label": "stress",
+        "confidence": 0.95,
+        "validation_message": "Valid stress-strain graph (both axes found)"
+    }
+]

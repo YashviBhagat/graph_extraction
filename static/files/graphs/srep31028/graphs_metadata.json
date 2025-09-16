@@ -1,8 +1,8 @@
 [
     {
-        "page": 2,
-        "filename": "1-s2.0-S0921509308005467-main_graph_2_2.jpeg",
-        "x_axis_label": "true strain",
+        "page": 7,
+        "filename": "srep31028_graph_7_2.jpeg",
+        "x_axis_label": "strain",
         "y_axis_label": "",
         "confidence": 0.8,
         "validation_message": "Valid stress-strain graph (one axis found)"

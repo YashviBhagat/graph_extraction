@@ -20,13 +20,13 @@ class GraphExtractor:
         # Comprehensive stress-strain axis patterns - must be exact matches
         self.x_labels = [
             # Basic strain patterns
-            'engineering strain', 'true strain', 'strain',
+            'engineering strain', 'true strain', 'strain','True ε'
             'engineering strain (%)', 'true strain (%)', 'strain (%)',
             'engineering strain(-)', 'true strain(-)', 'strain(-)',
             'engineering strain (', 'true strain (', 'strain (',
-            'engineering strain(', 'true strain(', 'strain(',
+            
             # With symbols
-            'true strain(ε)', 'strain(ε)', 'engineering strain(ε)',
+            'true strain(ε)', 'strain(ε)', 'engineering strain(ε)','engineering strain,ε(%)'
             
             # With commas and symbols
             'engineering strain, ε', 'engineering strain, ε (',
@@ -52,9 +52,9 @@ class GraphExtractor:
             'stress (', 'engineering stress(', 'true stress(', 'tensile stress(',
             # With commas and symbols
             'engineering stress, σ', 'engineering stress, σ (',
-            'stress, σ',
+            'stress, σ','Engineering stree,σt(GPa)',
             # Symbol with comma and unit
-            'σ, mpa', 'σ, gpa',
+            'σ, Mpa', 'σ, gpa',
             # Symbols only
             'σ', 'sigma'
         ]
@@ -147,13 +147,13 @@ class GraphExtractor:
             
             # Check for X-axis labels using exact pattern matching
             for pattern in self.x_labels:
-                if re.search(r'\b' + re.escape(pattern) + r'\b', full_text_context):
+                if re.search(r'\b' + re.escape(pattern) + r'\b', full_text_context, re.IGNORECASE):
                     x_axis_label = pattern
                     break
             
-            # Check for Y-axis labels using exact pattern matching
+            # Check for Y-axis labels using case-insensitive pattern matching
             for pattern in self.y_labels:
-                if re.search(r'\b' + re.escape(pattern) + r'\b', full_text_context):
+                if re.search(r'\b' + re.escape(pattern) + r'\b', full_text_context, re.IGNORECASE):
                     y_axis_label = pattern
                     break
             
@@ -225,8 +225,9 @@ class GraphExtractor:
 
                     # Only include if confidence is above threshold
                     # if confidence >= self.min_confidence:
-                    # Generate a unique filename for the graph
-                    graph_filename = f"graph_{page_num+1}_{img_index+1}.jpeg"
+                    # Generate a unique filename for the graph using PDF name
+                    pdf_name = os.path.splitext(os.path.basename(pdf_path))[0]
+                    graph_filename = f"{pdf_name}_graph_{page_num+1}_{img_index+1}.jpeg"
                     final_graph_path = os.path.join(output_folder, graph_filename)
                     
                     # Move the temporary image to its final name
