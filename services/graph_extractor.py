@@ -27,8 +27,7 @@ class GraphExtractor:
             'engineering strain(', 'true strain(', 'strain(',
             # With symbols
             'true strain(ε)', 'strain(ε)', 'engineering strain(ε)',
-            'true strain (ε)', 'strain (ε)', 'engineering strain (ε)',
-            'true strain(ε)', 'strain(ε)', 'engineering strain(ε)',
+            
             # With commas and symbols
             'engineering strain, ε', 'engineering strain, ε (',
             'strain, ε',
@@ -43,12 +42,11 @@ class GraphExtractor:
             'engineering stress', 'true stress', 'tensile stress', 'stress',
             # With MPa units
             'engineering stress (mpa)', 'true stress (mpa)', 'tensile stress (mpa)',
-            'engineering stress (mpa)', 'true stress (mpa)', 'tensile stress (mpa)',
-            'engineering stress(mpa)', 'true stress(mpa)', 'tensile stress(mpa)',
+            'Engineering Stress (mpa)', 'True Stress (mpa)', 'Tensile Stress (mpa)',
+            
             # With GPa units
             'engineering stress (gpa)', 'true stress (gpa)', 'tensile stress (gpa)',
-            'engineering stress (gpa)', 'true stress (gpa)', 'tensile stress (gpa)',
-            'engineering stress(gpa)', 'true stress(gpa)', 'tensile stress(gpa)',
+            
             # With parentheses
             'engineering stress (', 'true stress (', 'tensile stress (',
             'stress (', 'engineering stress(', 'true stress(', 'tensile stress(',
@@ -62,29 +60,29 @@ class GraphExtractor:
         ]
         
         # Patterns to exclude non-stress-strain graphs
-        self.exclude_patterns = [
-            'x-ray', 'xrd', 'diffraction', 'intensity', '2theta', 'theta', 'degrees',
-            'crystallographic', 'plane', 'indices', 'peak', 'peaks', 'reflection',
-            'sem', 'tem', 'microscopy', 'micrograph', 'edx', 'elemental', 'composition',
-            'ftir', 'raman', 'spectroscopy', 'absorbance', 'transmittance',
-            'voltage', 'current', 'power', 'resistance', 'impedance', 'frequency',
-            'temperature', 'heat', 'thermal', 'conductivity', 'enthalpy',
-            'time', 'rate', 'kinetics', 'concentration', 'ph', 'catalyst',
-            'hardness', 'modulus', 'toughness', 'fatigue', 'creep', 'fracture',
-            'displacement', 'load', 'elongation', 'force'
-        ]
+        # self.exclude_patterns = [
+        #     'x-ray', 'xrd', 'diffraction', 'intensity', '2theta', 'theta', 'degrees',
+        #     'crystallographic', 'plane', 'indices', 'peak', 'peaks', 'reflection',
+        #     'sem', 'tem', 'microscopy', 'micrograph', 'edx', 'elemental', 'composition',
+        #     'ftir', 'raman', 'spectroscopy', 'absorbance', 'transmittance',
+        #     'voltage', 'current', 'power', 'resistance', 'impedance', 'frequency',
+        #     'temperature', 'heat', 'thermal', 'conductivity', 'enthalpy',
+        #     'time', 'rate', 'kinetics', 'concentration', 'ph', 'catalyst',
+        #     'hardness', 'modulus', 'toughness', 'fatigue', 'creep', 'fracture',
+        #     'displacement', 'load', 'elongation', 'force'
+        # ]
         
-        self.min_confidence = 0.70 # Higher threshold for better accuracy
+        # self.min_confidence = 0.50 # Lowered threshold for better detection
     
     def _is_valid_stress_strain_graph(self, detected_text, x_found, y_found):
         """Strict validation to ensure it's actually a stress-strain graph."""
         text_lower = detected_text.lower()
         
         # Check for exclusion patterns first
-        for pattern in self.exclude_patterns:
-            if re.search(r'\b' + re.escape(pattern) + r'\b', text_lower):
-                logger.info(f"Excluding graph due to pattern: {pattern}")
-                return False, f"Excluded due to {pattern} pattern"
+        # for pattern in self.exclude_patterns:
+        #     if re.search(r'\b' + re.escape(pattern) + r'\b', text_lower):
+        #         logger.info(f"Excluding graph due to pattern: {pattern}")
+        #         return False, f"Excluded due to {pattern} pattern"
         
         # MUST have at least one axis label to be considered
         if not x_found and not y_found:
@@ -226,30 +224,30 @@ class GraphExtractor:
                         confidence = max(confidence, 0.75) # Ensure good confidence if context is strong
 
                     # Only include if confidence is above threshold
-                    if confidence >= self.min_confidence:
-                        # Generate a unique filename for the graph
-                        graph_filename = f"graph_{page_num+1}_{img_index+1}.jpeg"
-                        final_graph_path = os.path.join(output_folder, graph_filename)
-                        
-                        # Move the temporary image to its final name
-                        shutil.move(temp_image_path, final_graph_path)
+                    # if confidence >= self.min_confidence:
+                    # Generate a unique filename for the graph
+                    graph_filename = f"graph_{page_num+1}_{img_index+1}.jpeg"
+                    final_graph_path = os.path.join(output_folder, graph_filename)
+                    
+                    # Move the temporary image to its final name
+                    shutil.move(temp_image_path, final_graph_path)
 
-                        graphs_metadata.append({
-                            'page': page_num + 1,
-                            'filename': graph_filename,
-                            'x_axis_label': x_axis_label,
-                            'y_axis_label': y_axis_label,
-                            'confidence': round(confidence, 2),
-                            'validation_message': validation_message
-                        })
-                        logger.info(f"✅ STRESS-STRAIN GRAPH FOUND: {graph_filename}")
-                        logger.info(f"   X-axis: '{x_axis_label}'")
-                        logger.info(f"   Y-axis: '{y_axis_label}'")
-                        logger.info(f"   Confidence: {confidence:.2f}")
-                        logger.info(f"   Validation: {validation_message}")
-                    else:
-                        logger.info(f"❌ Graph rejected: Low confidence ({confidence:.2f}) for image on page {page_num+1}, index {img_index}")
-                        os.remove(temp_image_path)
+                    graphs_metadata.append({
+                        'page': page_num + 1,
+                        'filename': graph_filename,
+                        'x_axis_label': x_axis_label,
+                        'y_axis_label': y_axis_label,
+                        'confidence': round(confidence, 2),
+                        'validation_message': validation_message
+                    })
+                    logger.info(f"✅ STRESS-STRAIN GRAPH FOUND: {graph_filename}")
+                    logger.info(f"   X-axis: '{x_axis_label}'")
+                    logger.info(f"   Y-axis: '{y_axis_label}'")
+                    logger.info(f"   Confidence: {confidence:.2f}")
+                    logger.info(f"   Validation: {validation_message}")
+                    # else:
+                    #     logger.info(f"❌ Graph rejected: Low confidence ({confidence:.2f}) for image on page {page_num+1}, index {img_index}")
+                    #     os.remove(temp_image_path)
                 else:
                     logger.info(f"❌ Graph rejected: {validation_message} for image on page {page_num+1}, index {img_index}")
                     os.remove(temp_image_path)
@@ -279,3 +277,229 @@ class GraphExtractor:
 
 # Create a global instance
 graph_extractor = GraphExtractor()
+
+# =============================================================================
+# NEW CODE: Extract All Images from PDF
+# =============================================================================
+
+def extract_all_images_from_pdf(pdf_path, output_dir):
+    """
+    Extract ALL images from a PDF file and save them.
+    
+    Args:
+        pdf_path (str): Path to the PDF file
+        output_dir (str): Directory to save extracted images
+    
+    Returns:
+        list: List of dictionaries with image information
+    """
+    import os
+    import fitz
+    from PIL import Image
+    import io
+    
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Open PDF
+    doc = fitz.open(pdf_path)
+    all_images = []
+    total_images = 0
+    
+    print(f'Processing PDF: {pdf_path}')
+    print(f'Total pages: {len(doc)}')
+    
+    for page_num in range(len(doc)):
+        page = doc[page_num]
+        page_images = page.get_images(full=True)
+        
+        print(f'Page {page_num + 1}: Found {len(page_images)} images')
+        
+        for img_index, img in enumerate(page_images):
+            try:
+                xref = img[0]  # Image reference number
+                pix = fitz.Pixmap(doc, xref)  # Get the image
+                
+                # Check if image is valid (not CMYK)
+                if pix.n - pix.alpha < 4:  # GRAY or RGB
+                    # Convert to PIL Image
+                    img_data = pix.tobytes("png")
+                    img_pil = Image.open(io.BytesIO(img_data))
+                    
+                    # Generate filename
+                    filename = f"page_{page_num+1:03d}_img_{img_index+1:03d}.png"
+                    filepath = os.path.join(output_dir, filename)
+                    
+                    # Save image
+                    img_pil.save(filepath)
+                    
+                    # Get image dimensions
+                    width, height = img_pil.size
+                    
+                    # Store image information
+                    image_info = {
+                        'filename': filename,
+                        'filepath': filepath,
+                        'page': page_num + 1,
+                        'image_index': img_index + 1,
+                        'xref': xref,
+                        'width': width,
+                        'height': height,
+                        'size_bytes': os.path.getsize(filepath)
+                    }
+                    
+                    all_images.append(image_info)
+                    total_images += 1
+                    
+                    print(f'  ✓ Saved: {filename} ({width}x{height})')
+                else:
+                    print(f'  ✗ Skipped: Image {img_index+1} (CMYK format)')
+                
+                pix = None  # Free memory
+                
+            except Exception as e:
+                print(f'  ✗ Error processing image {img_index+1}: {e}')
+                continue
+    
+    doc.close()
+    
+    print(f'\nTotal images extracted: {total_images}')
+    print(f'Images saved to: {output_dir}')
+    
+    return all_images
+
+
+# def extract_all_images_with_details(pdf_path, output_dir):
+#     """
+#     Extract ALL images with detailed analysis and filtering.
+    
+#     Args:
+#         pdf_path (str): Path to the PDF file
+#         output_dir (str): Directory to save extracted images
+    
+#     Returns:
+#         dict: Detailed statistics and image information
+#     """
+#     import os
+#     import fitz
+#     from PIL import Image
+#     import io
+#     import cv2
+#     import numpy as np
+    
+#     # Create output directory if it doesn't exist
+#     os.makedirs(output_dir, exist_ok=True)
+    
+#     # Open PDF
+#     doc = fitz.open(pdf_path)
+#     all_images = []
+#     statistics = {
+#         'total_pages': len(doc),
+#         'total_images_found': 0,
+#         'total_images_saved': 0,
+#         'images_by_page': {},
+#         'size_distribution': {'small': 0, 'medium': 0, 'large': 0},
+#         'format_distribution': {'png': 0, 'jpeg': 0, 'other': 0}
+#     }
+    
+#     print(f'Processing PDF: {pdf_path}')
+#     print(f'Total pages: {len(doc)}')
+    
+#     for page_num in range(len(doc)):
+#         page = doc[page_num]
+#         page_images = page.get_images(full=True)
+#         page_saved = 0
+        
+#         print(f'\nPage {page_num + 1}: Found {len(page_images)} images')
+        
+#         for img_index, img in enumerate(page_images):
+#             try:
+#                 xref = img[0]
+#                 pix = fitz.Pixmap(doc, xref)
+                
+#                 if pix.n - pix.alpha < 4:  # Valid image
+#                     # Convert to PIL Image
+#                     img_data = pix.tobytes("png")
+#                     img_pil = Image.open(io.BytesIO(img_data))
+                    
+#                     # Get image dimensions
+#                     width, height = img_pil.size
+#                     area = width * height
+                    
+#                     # Categorize by size
+#                     if area < 100000:  # < 100k pixels
+#                         size_category = 'small'
+#                     elif area < 1000000:  # < 1M pixels
+#                         size_category = 'medium'
+#                     else:
+#                         size_category = 'large'
+                    
+#                     # Generate filename
+#                     filename = f"page_{page_num+1:03d}_img_{img_index+1:03d}_{size_category}.png"
+#                     filepath = os.path.join(output_dir, filename)
+                    
+#                     # Save image
+#                     img_pil.save(filepath)
+                    
+#                     # Analyze image content (basic)
+#                     img_cv = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+#                     gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+#                     edges = cv2.Canny(gray, 50, 150)
+#                     line_count = len(cv2.HoughLinesP(edges, 1, np.pi/180, threshold=30, minLineLength=20, maxLineGap=10)) if cv2.HoughLinesP(edges, 1, np.pi/180, threshold=30, minLineLength=20, maxLineGap=10) is not None else 0
+                    
+#                     # Store detailed image information
+#                     image_info = {
+#                         'filename': filename,
+#                         'filepath': filepath,
+#                         'page': page_num + 1,
+#                         'image_index': img_index + 1,
+#                         'xref': xref,
+#                         'width': width,
+#                         'height': height,
+#                         'area': area,
+#                         'aspect_ratio': width / height,
+#                         'size_category': size_category,
+#                         'line_count': line_count,
+#                         'size_bytes': os.path.getsize(filepath)
+#                     }
+                    
+#                     all_images.append(image_info)
+#                     statistics['total_images_saved'] += 1
+#                     statistics['size_distribution'][size_category] += 1
+#                     page_saved += 1
+                    
+#                     print(f'  ✓ Saved: {filename} ({width}x{height}, {size_category})')
+#                 else:
+#                     print(f'  ✗ Skipped: Image {img_index+1} (CMYK format)')
+                
+#                 statistics['total_images_found'] += 1
+#                 pix = None
+                
+#             except Exception as e:
+#                 print(f'  ✗ Error processing image {img_index+1}: {e}')
+#                 statistics['total_images_found'] += 1
+#                 continue
+        
+#         statistics['images_by_page'][page_num + 1] = page_saved
+    
+#     doc.close()
+    
+#     # Print summary
+#     print(f'\n' + '='*50)
+#     print(f'EXTRACTION SUMMARY')
+#     print(f'='*50)
+#     print(f'Total pages processed: {statistics["total_pages"]}')
+#     print(f'Total images found: {statistics["total_images_found"]}')
+#     print(f'Total images saved: {statistics["total_images_saved"]}')
+#     print(f'\nSize distribution:')
+#     for size, count in statistics['size_distribution'].items():
+#         print(f'  {size.capitalize()}: {count} images')
+#     print(f'\nImages per page:')
+#     for page, count in statistics['images_by_page'].items():
+#         print(f'  Page {page}: {count} images')
+#     print(f'\nImages saved to: {output_dir}')
+    
+#     return {
+#         'images': all_images,
+#         'statistics': statistics
+#     }

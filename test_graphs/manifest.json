@@ -1,0 +1,128 @@
+{
+  "pdf": "static/files/srep31028.pdf",
+  "count": 6,
+  "detections": [
+    {
+      "file": "test_graphs/graph_p01_b7c02c07.png",
+      "page": 1,
+      "kind": "page_fallback",
+      "score": 8.5,
+      "confidence": 0.71,
+      "evidence": {
+        "x_band": "as, \u00a9 1s ae ea is aa : any favorable ordering enthalpy could overcome the slower increasing entropy - a point often not given its due : importance. thus, investigations of the hea structural, chemical, and relative stability properties arising from the : unique composition-structure relationship are alone intriguing, and deformation properties, in particular, have : an important engineering role. : the deformation process in heas for quasi-static loading at low strain rates (10-7 to 10~* s~') reveals the se ig es gr te gg et ee ls id ee eg tt 8 ol ll eet ok gl ll ok te nt fo cin? .\u20141\\",
+        "y_band": "received accept published:",
+        "page_hit": true,
+        "neg_hits": [],
+        "x_tokens": [
+          "\\bstrain\\b"
+        ],
+        "y_tokens": [],
+        "tick_x": 2,
+        "tick_y": 0,
+        "graphiness": 2
+      }
+    },
+    {
+      "file": "test_graphs/graph_p02_385d44fa.png",
+      "page": 2,
+      "kind": "page_fallback",
+      "score": 8.5,
+      "confidence": 0.71,
+      "evidence": {
+        "x_band": "hcp (a3) conditions. in al,crcofeni, the al content can influence the final structural configuration\u00ae***\u201d due to the larger atom size, compared to other constituents, which considerably changes the lattice ordering. when the mole fraction of al <0.3, a single-phase a1 is observed, and a single-phase a2 is found for al >1.17, while a two-phase (a1 + a2) for 0.3 < al <1.17 is reported\u201d*\u201d*\u00ae. using the methods and approximations for accurate esti- mates of the formation enthalpy and relative energy of al and a2 phases\u2019, the first-principles kkr-cpa results in fig. 2 for al of 0< x <2 mole fractions predict a similar global stability found in the experiment, i.e., al for",
+        "y_band": "",
+        "page_hit": true,
+        "neg_hits": [],
+        "x_tokens": [
+          "\\be\\b"
+        ],
+        "y_tokens": [],
+        "tick_x": 2,
+        "tick_y": 0,
+        "graphiness": 2
+      }
+    },
+    {
+      "file": "test_graphs/graph_p04_d072b597.png",
+      "page": 4,
+      "kind": "page_fallback",
+      "score": 8.5,
+      "confidence": 0.71,
+      "evidence": {
+        "x_band": "on fig. 7 while going from 300 to 500 k, which is attributed to an initial increase in the size of the al-al cluster size. however, as a temperature rise induces disorder in the atomistic rearrangement, this correlation decreases above 500 k in the simulated hea. the engineering stress versus engineering strain curves for al) ;crcofeni under dynamic compressive and tensile loadings at different temperatures from 77 k to 1,000 k are illustrated in fig. 8[a,b], respectively. for com- neaceia inading a naale flaus ctrace al wtiern ds tc eaznrded at wi and 2nnyk schile it te lon nida at tan and",
+        "y_band": "",
+        "page_hit": true,
+        "neg_hits": [],
+        "x_tokens": [
+          "engineering\\s*strain",
+          "\\bstrain\\b"
+        ],
+        "y_tokens": [],
+        "tick_x": 2,
+        "tick_y": 0,
+        "graphiness": 2
+      }
+    },
+    {
+      "file": "test_graphs/graph_p07_6ad966fb.png",
+      "page": 7,
+      "kind": "embedded",
+      "score": 9.5,
+      "confidence": 0.79,
+      "evidence": {
+        "x_band": "u u.to u.9 u.40 u.0 u.s u.iu u.to u.9 u.40 u.0 u./o u9 engg. strain (%) engg. strain (%)",
+        "y_band": "160 wo cc oo = 120 \u2014 o ao 2 80 ~\u201do m 40 do < lu p (\u00a2 (on",
+        "page_hit": true,
+        "neg_hits": [],
+        "x_tokens": [
+          "\\bstrain\\b",
+          "%"
+        ],
+        "y_tokens": [],
+        "tick_x": 2,
+        "tick_y": 0,
+        "graphiness": 2
+      }
+    },
+    {
+      "file": "test_graphs/graph_p10_8c378abc.png",
+      "page": 10,
+      "kind": "page_fallback",
+      "score": 8.5,
+      "confidence": 0.71,
+      "evidence": {
+        "x_band": "ji. lewangowske, j. je ox mitcch, sh. le. loemipctalule l1s\u20ac al sli\u20acal vallgs m1 ticlalic sldss\u20acs. inalute lmlaletiuls dy li- 10 \\luu0). 34. polk, d. e. & turnbull, d. flow of melt and glass forms of metallic glasses. acta metallurgica 20, 493-498 (1981). 35. huang, x. & mashimo, t. metastable bcc and fcc alloy bulk bodies in fe~cu system prepared by mechanical alloying and shock compression. journal of alloys and compounds 288, 299-305 (1999). 36. wang, b. t., shao, j. l., zhang, g. c., li, w. d. & zhang, p. molecular dynamics simulations of hcp/fcc nucleation and growth in bec iron driven by uniaxial compression. journal of physics: condensed matter 21, 1-6 (2009). 37. johnson, d. d. & pinski, f. j. inclusion of charge correlations in calculations of the energetics and electronic structure for random",
+        "y_band": "www.natu",
+        "page_hit": true,
+        "neg_hits": [],
+        "x_tokens": [
+          "\\be\\b"
+        ],
+        "y_tokens": [],
+        "tick_x": 2,
+        "tick_y": 0,
+        "graphiness": 2
+      }
+    },
+    {
+      "file": "test_graphs/graph_p10_949b24ff.png",
+      "page": 10,
+      "kind": "page_fallback",
+      "score": 8.5,
+      "confidence": 0.71,
+      "evidence": {
+        "x_band": "puryieara lut cicculoilic slluclulis caiculdliollo, a tlyorcue incvicw d of, t~1l1 (l2uil). 47. johnson, d. d. (ed kaufmann, e. n.) 1-31 (john wiley and sons inc., 2012). 48. fontaine, d. d. vol. 34 (eds ehrenreich, h., seitz, f & turnbull, d.) 73 (academic press, 1979). 49. althoff, j. d., johnson, d. d., pinski, f. j. & staunton, j. b. electronic origins of ordering in multicomponent metallic alloys: application to the cu-ni-zn system. physical review b 53, 10610-10625 (1996). 50. althoff, j. d., johnson, d. d. & pinski, f. j. commensurate and incommensurate ordering tendencies in the ternary fcc cu-ni-zn system. physical review letters 74, 138-141 (1995).",
+        "y_band": "",
+        "page_hit": true,
+        "neg_hits": [],
+        "x_tokens": [
+          "\\be\\b"
+        ],
+        "y_tokens": [],
+        "tick_x": 2,
+        "tick_y": 0,
+        "graphiness": 2
+      }
+    }
+  ]
+}

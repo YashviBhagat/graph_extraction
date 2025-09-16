@@ -1,0 +1,18 @@
+[
+    {
+        "page": 11,
+        "filename": "graph_11_1.jpeg",
+        "x_axis_label": "engineering strain",
+        "y_axis_label": "",
+        "confidence": 0.8,
+        "validation_message": "Valid stress-strain graph (one axis found)"
+    },
+    {
+        "page": 16,
+        "filename": "graph_16_1.jpeg",
+        "x_axis_label": "strain",
+        "y_axis_label": "",
+        "confidence": 0.8,
+        "validation_message": "Valid stress-strain graph (one axis found)"
+    }
+]
