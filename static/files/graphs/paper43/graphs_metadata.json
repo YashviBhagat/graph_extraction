@@ -1,0 +1,42 @@
+[
+    {
+        "page": 2,
+        "filename": "graph_2_1.jpeg",
+        "x_axis_label": "",
+        "y_axis_label": "",
+        "confidence": 0.5,
+        "validation_message": "Valid stress-strain graph (context found)"
+    },
+    {
+        "page": 4,
+        "filename": "graph_4_1.jpeg",
+        "x_axis_label": "",
+        "y_axis_label": "",
+        "confidence": 0.5,
+        "validation_message": "Valid stress-strain graph (context found)"
+    },
+    {
+        "page": 5,
+        "filename": "graph_5_1.jpeg",
+        "x_axis_label": "",
+        "y_axis_label": "",
+        "confidence": 0.5,
+        "validation_message": "Valid stress-strain graph (context found)"
+    },
+    {
+        "page": 5,
+        "filename": "graph_5_2.jpeg",
+        "x_axis_label": "",
+        "y_axis_label": "",
+        "confidence": 0.5,
+        "validation_message": "Valid stress-strain graph (context found)"
+    },
+    {
+        "page": 5,
+        "filename": "graph_5_10.jpeg",
+        "x_axis_label": "",
+        "y_axis_label": "",
+        "confidence": 0.5,
+        "validation_message": "Valid stress-strain graph (context found)"
+    }
+]

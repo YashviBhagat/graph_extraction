@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphs - {{ pdf_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            margin-top: 30px;
+        }
+        
+        .page-header {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .graph-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: #fff;
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .graph-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .graph-image {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .graph-info {
+            padding: 12px;
+        }
+        
+        .graph-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        
+        .graph-meta {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+        
+        .back-btn {
+            margin-bottom: 20px;
+        }
+        
+        .no-graphs {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        
+        .no-graphs i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        #graphGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="mb-1">📊 Extracted Graphs</h1>
+                    <p class="text-muted mb-0">{{ pdf_name }}</p>
+                </div>
+                <a href="{{ url_for('gallery.gallery') }}" class="btn btn-outline-primary back-btn">
+                    <i class="bi bi-arrow-left"></i> Back to Gallery
+                </a>
+            </div>
+        </div>
+
+        <!-- Graphs Grid -->
+        {% if graphs %}
+            <div id="graphGrid">
+                {% for graph in graphs %}
+                <div class="graph-card">
+                    <img src="{{ url_for('graphs.get_graph_image', filename=graph.filename) }}" 
+                         alt="Graph {{ loop.index }}" 
+                         class="graph-image"
+                         onclick="openFullscreen(this)">
+                    <div class="graph-info">
+                        <div class="graph-title">{{ graph.filename }}</div>
+                        <div class="graph-meta">
+                            <i class="bi bi-file-image"></i> Graph {{ loop.index }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- No Graphs Message -->
+            <div class="no-graphs">
+                <i class="bi bi-graph-up"></i>
+                <h4>No graphs found</h4>
+                <p>No stress-strain graphs were detected in this PDF.</p>
+                <a href="{{ url_for('gallery.gallery') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Back to Gallery
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Fullscreen Modal -->
+    <div class="modal fade" id="fullscreenModal" tabindex="-1" aria-labelledby="fullscreenModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fullscreenModalLabel">Graph View</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="fullscreenImage" src="" alt="Fullscreen Graph" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openFullscreen(img) {
+            const fullscreenImage = document.getElementById('fullscreenImage');
+            const fullscreenModal = new bootstrap.Modal(document.getElementById('fullscreenModal'));
+            
+            fullscreenImage.src = img.src;
+            fullscreenModal.show();
+        }
+    </script>
+</body>
+</html>

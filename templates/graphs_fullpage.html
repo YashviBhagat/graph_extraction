@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress-Strain Graphs - {{ pdf_filename }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .fullpage-container {
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+        
+        .graphs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .graph-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .graph-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
+        .graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .graph-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .graph-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .meta-item i {
+            color: #007bff;
+        }
+        
+        .graph-image-container {
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .graph-image-container:hover {
+            background: #e9ecef;
+        }
+        
+        .graph-image {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .axis-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #e3f2fd;
+            border-radius: 6px;
+        }
+        
+        .axis-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .axis-label .label-text {
+            font-weight: 600;
+            color: #1976d2;
+            font-size: 0.9rem;
+        }
+        
+        .axis-label .label-type {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .no-graphs {
+            text-align: center;
+            padding: 80px 20px;
+            color: #6c757d;
+        }
+        
+        .no-graphs i {
+            font-size: 5rem;
+            margin-bottom: 30px;
+            opacity: 0.5;
+        }
+        
+        .no-graphs h2 {
+            margin-bottom: 20px;
+            color: #495057;
+        }
+        
+        .loading-container {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 1000;
+            background: white;
+            border: 2px solid #007bff;
+            color: #007bff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .back-btn:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .confidence-badge {
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .confidence-badge.medium {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .confidence-badge.low {
+            background: #dc3545;
+        }
+        
+        @media (max-width: 768px) {
+            .fullpage-container {
+                padding: 10px;
+            }
+            
+            .header-section {
+                padding: 15px;
+            }
+            
+            .graph-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .graph-meta {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .axis-labels {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .back-btn {
+                top: 15px;
+                left: 15px;
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="{{ url_for('gallery.gallery') }}" class="back-btn">
+        <i class="bi bi-arrow-left"></i> Back to Gallery
+    </a>
+    
+    <div class="fullpage-container">
+        <div class="header-section">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2">📊 Stress-Strain Graphs</h1>
+                    <p class="text-muted mb-0">{{ pdf_filename }}</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="d-flex align-items-center justify-content-md-end gap-3">
+                        <span class="badge bg-primary fs-6" id="graphCount">
+                            {{ graphs|length }} Valid Graph{{ 's' if graphs|length != 1 else '' }}
+                        </span>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="refreshGraphs()">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="graphs-container" id="graphsContainer">
+            {% if graphs %}
+                {% for graph in graphs %}
+                <div class="graph-item">
+                    <div class="graph-header">
+                        <h3 class="graph-title">Graph {{ loop.index }}</h3>
+                        <div class="graph-meta">
+                            <div class="meta-item">
+                                <i class="bi bi-file-image"></i>
+                                <span>Page {{ graph.page }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="bi bi-check-circle"></i>
+                                <span class="confidence-badge {{ 'low' if graph.confidence < 0.7 else 'medium' if graph.confidence < 0.9 else '' }}">
+                                    {{ (graph.confidence * 100)|round }}% Confidence
+                                </span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="bi bi-zoom-in"></i>
+                                <span>Click to enlarge</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="graph-image-container" onclick="openFullscreen('{{ url_for('graphs.get_graph_image', filename=graph.filename) }}')">
+                        <img src="{{ url_for('graphs.get_graph_image', filename=graph.filename) }}" 
+                             alt="Stress-Strain Graph {{ loop.index }}" 
+                             class="graph-image">
+                    </div>
+                    
+                    <div class="axis-labels">
+                        <div class="axis-label">
+                            <div class="label-text">X-Axis</div>
+                            <div class="label-type">{{ graph.x_label or 'Not detected' }}</div>
+                        </div>
+                        <div class="axis-label">
+                            <div class="label-text">Y-Axis</div>
+                            <div class="label-type">{{ graph.y_label or 'Not detected' }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-graphs">
+                    <i class="bi bi-graph-up"></i>
+                    <h2>No Valid Stress-Strain Graphs Found</h2>
+                    <p class="lead">No graphs with both X-axis and Y-axis labels were detected in this PDF.</p>
+                    <p class="text-muted">The system only displays graphs that have clear strain and stress axis labels.</p>
+                    <a href="{{ url_for('gallery.gallery') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-arrow-left"></i> Back to Gallery
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Fullscreen Image Modal -->
+    <div class="modal fade" id="fullscreenModal" tabindex="-1" aria-labelledby="fullscreenModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fullscreenModalLabel">Graph View</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="fullscreenImage" src="" alt="Fullscreen Graph" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openFullscreen(imageSrc) {
+            const fullscreenImage = document.getElementById('fullscreenImage');
+            const fullscreenModal = new bootstrap.Modal(document.getElementById('fullscreenModal'));
+            
+            fullscreenImage.src = imageSrc;
+            fullscreenModal.show();
+        }
+        
+        function refreshGraphs() {
+            window.location.reload();
+        }
+        
+        // Add smooth scrolling
+        document.documentElement.style.scrollBehavior = 'smooth';
+        
+        // Add loading animation for images
+        document.querySelectorAll('.graph-image').forEach(img => {
+            img.addEventListener('load', function() {
+                this.style.opacity = '1';
+            });
+            
+            img.addEventListener('error', function() {
+                this.style.opacity = '0.5';
+                this.alt = 'Image failed to load';
+            });
+        });
+    </script>
+</body>
+</html>
